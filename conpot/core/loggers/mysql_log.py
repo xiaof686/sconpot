@@ -75,7 +75,14 @@ class MySQLlogger(object):
 
     def log(self, event, retry=1):
         cursor = self.conn.cursor()
-
+        if type(event["data"].get('request')) == str:
+            data_request = event["data"].get('request')
+        else:
+            data_request = "None"
+        if type(event["data"].get('response')) == str:
+            data_response = event["data"].get('response')
+        else:
+            data_response = "None"
         try:
             cursor.execute("""INSERT INTO
                                 events (sensorid, session, remote, protocol, request, response)
@@ -84,8 +91,8 @@ class MySQLlogger(object):
                                                               str(event["id"]),
                                                               str(event["remote"]),
                                                               event["data_type"],
-                                                              event["data"].get('request'),
-                                                              event["data"].get('response')))
+                                                              data_request,
+                                                              data_response))
             self.conn.commit()
         except (AttributeError, MySQLdb.OperationalError):
             self._connect()
